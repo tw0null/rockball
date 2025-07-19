@@ -1,0 +1,5 @@
+name: multiblock
+version: '1.0-SNAPSHOT'
+main: io.github.tw0null.multiblock.plugin.RockballPlugin
+api-version: '1.21'
+authors: [ tw0null ]
