@@ -21,7 +21,6 @@ import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Transformation
@@ -36,19 +35,14 @@ class RockSnowBall(private val plugin: RockballPlugin): Listener {
     val keyDistance = NamespacedKey(plugin, "rockball_distance")
     private val startShiftTime = mutableMapOf<UUID, Long>()
     private val displayingPlayers = mutableMapOf<UUID, BukkitRunnable>()
-    val UUID.player get() =  Bukkit.getPlayer(this)
 
     fun launch(player: Player, distance: Double){
-        val rItem = player.inventory.itemInMainHand
-        val lItem = player.inventory.itemInOffHand
-
         val rockball = player.launchProjectile(Snowball::class.java).apply {
             velocity = player.location.direction.normalize().multiply(distance)
             persistentDataContainer.set(keyDistance, PersistentDataType.DOUBLE, distance)
             isSilent = true
             isInvisible = true
         }
-//        player.sendMessage(Component.text("distance : $distance"))
 
         Bukkit.getOnlinePlayers().forEach { it.hideEntity(plugin, rockball) }
 
@@ -104,7 +98,7 @@ class RockSnowBall(private val plugin: RockballPlugin): Listener {
                 val distance = calculateRockBallDistance(duration)
                 val rounded = round(distance * 10) / 10
                 player.sendActionBar(Component.text(
-                    "${rounded} BOOST!",
+                    "$rounded BOOST!",
                 ).color(NamedTextColor.AQUA))
             }
         }.runTaskTimer(plugin, 0L, 5L)
@@ -132,7 +126,6 @@ class RockSnowBall(private val plugin: RockballPlugin): Listener {
             event.damage = 2 * distance * 3
         } else if (damager is Player) {
             event.isCancelled = true
-            damager.sendActionBar(Component.text("돌노우볼을 사용하세요."))
         }
     }
 
@@ -168,7 +161,7 @@ class RockSnowBall(private val plugin: RockballPlugin): Listener {
 
 
 
-        // 블럭이 설치되면 날리지 않기
+        // Do not launch on block place
 
         if (event.clickedBlock != null && event.useInteractedBlock() != Event.Result.DENY) return
 
